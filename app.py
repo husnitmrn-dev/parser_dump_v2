@@ -4,10 +4,28 @@ from __future__ import annotations
 
 from io import BytesIO
 from pathlib import Path
+import sys
 
 import streamlit as st
 
-from ubah_MML_dump_v2 import parse_mml_text, write_workbook
+APP_DIRECTORY = Path(__file__).resolve().parent
+PARSER_DIRECTORIES = (APP_DIRECTORY, APP_DIRECTORY / "Final Script")
+for parser_directory in PARSER_DIRECTORIES:
+    if (
+        (parser_directory / "ubah_MML_dump_v2.py").is_file()
+        and str(parser_directory) not in sys.path
+    ):
+        sys.path.insert(0, str(parser_directory))
+
+try:
+    from ubah_MML_dump_v2 import parse_mml_text, write_workbook
+except ModuleNotFoundError as error:
+    if error.name != "ubah_MML_dump_v2":
+        raise
+    raise ModuleNotFoundError(
+        "Parser module 'ubah_MML_dump_v2.py' was not found. "
+        "Include it beside app.py or in the 'Final Script' directory."
+    ) from error
 
 
 st.set_page_config(page_title="MML Dump Parser", page_icon="📄")
